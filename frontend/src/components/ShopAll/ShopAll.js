@@ -4,7 +4,8 @@ import {
   ShoppingCart, Heart, Eye, Truck, Shield,
   RefreshCw, TrendingUp, Check
 } from 'lucide-react';
-import ProductCard from './ProductCard.js'; // We'll create this component
+import NavBar from '../NavBar/NavBar.js';
+import Footer from '../Footer/Footer.js';
 import './ShopAll.css';
 
 function ShopAll() {
@@ -21,12 +22,146 @@ function ShopAll() {
   const [showMobileFilters, setShowMobileFilters] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const productsPerPage = 12;
+  const [cartCount, setCartCount] = useState(0);
 
   // Filter states
   const [categories, setCategories] = useState([]);
   const [brands, setBrands] = useState([]);
   const [skinTypes, setSkinTypes] = useState([]);
   const [countries, setCountries] = useState([]);
+
+  // Product Card Component (moved inside ShopAll)
+  const ProductCard = ({ product, viewMode }) => {
+    const [isWishlisted, setIsWishlisted] = useState(false);
+    const [isHovered, setIsHovered] = useState(false);
+
+    const addToCart = () => {
+      setCartCount(prev => prev + 1);
+      console.log('Added to cart:', product.id);
+    };
+
+    const toggleWishlist = () => {
+      setIsWishlisted(!isWishlisted);
+    };
+
+    const quickView = () => {
+      console.log('Quick view:', product.id);
+    };
+
+    if (viewMode === 'list') {
+      return (
+        <div className="product-card list-view">
+          <div className="product-image">
+            <img src={product.image} alt={product.name} />
+            {product.discount > 0 && (
+              <div className="discount-badge">-{product.discount}%</div>
+            )}
+            {product.isNew && <div className="new-badge">NEW</div>}
+            <div className="product-actions">
+              <button className="action-btn" onClick={quickView}>
+                <Eye size={18} />
+              </button>
+              <button 
+                className={`action-btn wishlist-btn ${isWishlisted ? 'active' : ''}`}
+                onClick={toggleWishlist}
+              >
+                <Heart size={18} fill={isWishlisted ? "currentColor" : "none"} />
+              </button>
+            </div>
+          </div>
+          <div className="product-info">
+            <div className="product-meta">
+              <span className="product-brand">{product.brand}</span>
+              <span className="product-country">{product.country}</span>
+            </div>
+            <h3 className="product-name">{product.name}</h3>
+            <p className="product-description">{product.description}</p>
+            <div className="product-details">
+              <div className="product-rating">
+                <Star size={14} fill="#FFD700" color="#FFD700" />
+                <span>{product.rating}</span>
+                <span className="reviews">({product.reviews} reviews)</span>
+              </div>
+              <span className="skin-type">{product.skinType}</span>
+            </div>
+            <div className="product-footer">
+              <div className="product-pricing">
+                <span className="current-price">${product.price.toFixed(2)}</span>
+                {product.originalPrice > product.price && (
+                  <span className="original-price">${product.originalPrice.toFixed(2)}</span>
+                )}
+              </div>
+              <button className="add-to-cart-btn" onClick={addToCart}>
+                <ShoppingCart size={16} /> Add to Cart
+              </button>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // Grid View (default)
+    return (
+      <div 
+        className="product-card grid-view"
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+      >
+        <div className="product-image">
+          <img src={product.image} alt={product.name} />
+          {product.discount > 0 && (
+            <div className="discount-badge">-{product.discount}%</div>
+          )}
+          {product.isNew && <div className="new-badge">NEW</div>}
+          {product.isBestSeller && <div className="bestseller-badge">BEST SELLER</div>}
+          <div className={`product-actions ${isHovered ? 'visible' : ''}`}>
+            <button className="action-btn" onClick={quickView}>
+              <Eye size={18} /> Quick View
+            </button>
+            <button className="action-btn" onClick={addToCart}>
+              <ShoppingCart size={18} /> Add to Cart
+            </button>
+            <button 
+              className={`action-btn wishlist-btn ${isWishlisted ? 'active' : ''}`}
+              onClick={toggleWishlist}
+            >
+              <Heart size={18} fill={isWishlisted ? "currentColor" : "none"} />
+            </button>
+          </div>
+          {!product.inStock && <div className="out-of-stock">Out of Stock</div>}
+        </div>
+        <div className="product-info">
+          <div className="product-meta">
+            <span className="product-brand">{product.brand}</span>
+            <span className="product-country">{product.country}</span>
+          </div>
+          <h3 className="product-name">{product.name}</h3>
+          <div className="product-rating">
+            <div className="stars">
+              {[...Array(5)].map((_, i) => (
+                <Star 
+                  key={i} 
+                  size={14} 
+                  fill={i < Math.floor(product.rating) ? "#FFD700" : "#E0E0E0"}
+                  color={i < Math.floor(product.rating) ? "#FFD700" : "#E0E0E0"}
+                />
+              ))}
+            </div>
+            <span className="rating-text">{product.rating} ({product.reviews})</span>
+          </div>
+          <div className="product-pricing">
+            <span className="current-price">${product.price.toFixed(2)}</span>
+            {product.originalPrice > product.price && (
+              <span className="original-price">${product.originalPrice.toFixed(2)}</span>
+            )}
+          </div>
+          <button className="add-to-cart-btn" onClick={addToCart} disabled={!product.inStock}>
+            <ShoppingCart size={16} /> {product.inStock ? 'Add to Cart' : 'Out of Stock'}
+          </button>
+        </div>
+      </div>
+    );
+  };
 
   // Load products and filters data
   useEffect(() => {
@@ -247,6 +382,7 @@ function ShopAll() {
   if (loading) {
     return (
       <div className="shop-all">
+        <NavBar cartCount={cartCount} categories={categories} />
         <div className="container">
           <div className="breadcrumb">
             <span>Home</span> <ChevronDown size={12} /> <span>Shop All</span>
@@ -260,12 +396,16 @@ function ShopAll() {
             </div>
           </div>
         </div>
+        <Footer />
       </div>
     );
   }
 
   return (
     <div className="shop-all">
+      {/* Navigation Bar */}
+      <NavBar cartCount={cartCount} categories={categories} />
+
       {/* Mobile Filter Overlay */}
       {showMobileFilters && (
         <div className="mobile-filters-overlay">
@@ -750,13 +890,11 @@ function ShopAll() {
           </div>
         </div>
       </div>
+
+      {/* Footer */}
+      <Footer />
     </div>
   );
 }
-
-
-  
-
-
 
 export default ShopAll;

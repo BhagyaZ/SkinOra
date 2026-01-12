@@ -1,18 +1,22 @@
 import React, { useState, useEffect } from 'react';
+import NavBar from '../NavBar/NavBar.js'
+import Footer from '../Footer/Footer.js';
 import { 
-  Search, ShoppingCart, User, Menu, X, 
-  Star, ChevronRight, Filter, Truck, 
-  Shield, RefreshCw, Phone, Mail, MapPin,
-  Facebook, Instagram, Twitter, Youtube
+  Star,
+  ChevronRight,
+  Truck,
+  Shield,
+  RefreshCw,
+  Phone,
+  ShoppingCart
 } from 'lucide-react';
+
 import './Home.css';
 
 function Home() {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [cartCount, setCartCount] = useState(3);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
   const [featuredBrands, setFeaturedBrands] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('all');
 
@@ -179,108 +183,30 @@ function Home() {
     console.log('Quick view for product:', productId);
   };
 
-  const bannerOffers = [
-    { id: 1, text: 'Free Delivery on Orders Over $50', icon: <Truck size={18} /> },
-    { id: 2, text: '30-Day Return Policy', icon: <RefreshCw size={18} /> },
-    { id: 3, text: 'Secure Payment', icon: <Shield size={18} /> },
-    { id: 4, text: 'Authentic Products', icon: <Star size={18} /> },
-  ];
-
   return (
     <div className="home">
-      {/* Top Banner */}
-      <div className="top-banner">
-        <div className="container">
-          <p>🎉 Grand Opening Sale: Up to 50% Off International Skincare!</p>
-        </div>
-      </div>
-
-      {/* Header */}
-      <header className="header">
-        <div className="container">
-          <div className="header-top">
-            <div className="logo">
-              <h1>SKIN<span>ORA</span></h1>
-              <p className="tagline">International Unisex Skincare</p>
-            </div>
-            
-            <div className="search-bar">
-              <div className="search-input">
-                <Search size={20} />
-                <input 
-                  type="text" 
-                  placeholder="Search for skincare, brands, or categories..." 
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
-              </div>
-              <button className="search-btn">Search</button>
-            </div>
-
-            <div className="header-actions">
-              <button className="icon-btn">
-                <User size={24} />
-                <span>Account</span>
-              </button>
-              <button className="icon-btn cart-btn">
-                <ShoppingCart size={24} />
-                <span>Cart</span>
-                {cartCount > 0 && <span className="cart-count">{cartCount}</span>}
-              </button>
-              <button 
-                className="mobile-menu-btn"
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              >
-                {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-              </button>
-            </div>
-          </div>
-
-          {/* Navigation */}
-          <nav className={`nav ${mobileMenuOpen ? 'open' : ''}`}>
-            <ul className="nav-list">
-              <li className="nav-item active"><a href="#">Home</a></li>
-              <li className="nav-item"><a href="#">Shop All</a></li>
-              <li className="nav-item has-dropdown">
-                <a href="#">Categories <ChevronRight size={16} /></a>
-                <div className="dropdown">
-                  {categories.map(cat => (
-                    <a key={cat.id} href="#" className="dropdown-item">
-                      <span className="dropdown-icon">{cat.icon}</span>
-                      {cat.name} <span className="count">({cat.count})</span>
-                    </a>
-                  ))}
-                </div>
-              </li>
-              <li className="nav-item"><a href="#">Brands</a></li>
-              <li className="nav-item"><a href="#">Men's</a></li>
-              <li className="nav-item"><a href="#">Sale</a></li>
-              <li className="nav-item"><a href="#">New Arrivals</a></li>
-              <li className="nav-item"><a href="#">Best Sellers</a></li>
-              <li className="nav-item"><a href="#">Skincare Guide</a></li>
-            </ul>
-            
-            <div className="nav-extra">
-              <a href="#" className="nav-link">
-                <Phone size={16} /> Contact: +1 (555) 123-4567
-              </a>
-              <a href="#" className="nav-link">
-                <Mail size={16} /> support@globalglow.com
-              </a>
-            </div>
-          </nav>
-        </div>
-      </header>
+      {/* Navigation Bar */}
+      <NavBar cartCount={cartCount} categories={categories} />
 
       {/* Offers Banner */}
       <div className="offers-banner">
         <div className="container">
-          {bannerOffers.map(offer => (
-            <div key={offer.id} className="offer-item">
-              {offer.icon}
-              <span>{offer.text}</span>
-            </div>
-          ))}
+          <div className="offer-item">
+            <Truck size={18} />
+            <span>Free Delivery on Orders Over $50</span>
+          </div>
+          <div className="offer-item">
+            <RefreshCw size={18} />
+            <span>30-Day Return Policy</span>
+          </div>
+          <div className="offer-item">
+            <Shield size={18} />
+            <span>Secure Payment</span>
+          </div>
+          <div className="offer-item">
+            <Star size={18} />
+            <span>Authentic Products</span>
+          </div>
         </div>
       </div>
 
@@ -311,7 +237,7 @@ function Home() {
           <div className="container">
             <div className="section-header">
               <h2 className="section-title">Shop By Category</h2>
-              <a href="#" className="view-all">View All <ChevronRight size={16} /></a>
+              <a href="/shop" className="view-all">View All <ChevronRight size={16} /></a>
             </div>
             <div className="categories-grid">
               {categories.map(category => (
@@ -403,7 +329,7 @@ function Home() {
             </div>
             
             <div className="view-more">
-              <button className="btn-secondary">View More Products</button>
+              <a href="/shop" className="btn-secondary">View More Products</a>
             </div>
           </div>
         </section>
@@ -421,7 +347,7 @@ function Home() {
                   <div className="brand-logo">{brand.logo}</div>
                   <h3>{brand.name}</h3>
                   <p>{brand.productCount} products</p>
-                  <button className="brand-btn">Shop Now</button>
+                  <a href={`/brand/${brand.name.toLowerCase()}`} className="brand-btn">Shop Now</a>
                 </div>
               ))}
             </div>
@@ -455,97 +381,10 @@ function Home() {
             </div>
           </div>
         </section>
-
-        {/* Newsletter */}
-        <section className="newsletter-section">
-          <div className="container">
-            <div className="newsletter-content">
-              <h2>Stay Updated</h2>
-              <p>Subscribe to get exclusive deals and skincare tips from around the world</p>
-              <form className="newsletter-form">
-                <input 
-                  type="email" 
-                  placeholder="Enter your email address" 
-                  required 
-                />
-                <button type="submit" className="btn-primary">Subscribe</button>
-              </form>
-              <p className="newsletter-note">By subscribing, you agree to our Privacy Policy</p>
-            </div>
-          </div>
-        </section>
       </main>
 
       {/* Footer */}
-      <footer className="footer">
-        <div className="container">
-          <div className="footer-grid">
-            <div className="footer-col">
-              <h3 className="footer-logo">SKIN<span>ORA</span></h3>
-              <p className="footer-description">
-                Your premier destination for authentic international skincare. 
-                We bring the world's best unisex skincare products to your doorstep.
-              </p>
-              <div className="social-links">
-                <a href="#"><Facebook size={20} /></a>
-                <a href="#"><Instagram size={20} /></a>
-                <a href="#"><Twitter size={20} /></a>
-                <a href="#"><Youtube size={20} /></a>
-              </div>
-            </div>
-            
-            <div className="footer-col">
-              <h4>Quick Links</h4>
-              <ul>
-                <li><a href="#">Home</a></li>
-                <li><a href="#">Shop All</a></li>
-                <li><a href="#">New Arrivals</a></li>
-                <li><a href="#">Best Sellers</a></li>
-                <li><a href="#">Sale</a></li>
-              </ul>
-            </div>
-            
-            <div className="footer-col">
-              <h4>Categories</h4>
-              <ul>
-                <li><a href="#">Face Care</a></li>
-                <li><a href="#">Body Care</a></li>
-                <li><a href="#">Hair Care</a></li>
-                <li><a href="#">Men's Grooming</a></li>
-                <li><a href="#">Sun Care</a></li>
-              </ul>
-            </div>
-            
-            <div className="footer-col">
-              <h4>Contact Us</h4>
-              <ul className="contact-info">
-                <li><MapPin size={16} /> 123 Beauty Street, Colombo 03, Sri Lanka</li>
-                <li><Phone size={16} /> +94 77 123 4567</li>
-                <li><Mail size={16} /> support@globalglow.com</li>
-              </ul>
-              <div className="payment-methods">
-                <span>We accept:</span>
-                <div className="payment-icons">
-                  <span>💳</span>
-                  <span>📱</span>
-                  <span>🏦</span>
-                  <span>📊</span>
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          <div className="footer-bottom">
-            <p>&copy; {new Date().getFullYear()} SKINORA. All rights reserved.</p>
-            <div className="footer-links">
-              <a href="#">Privacy Policy</a>
-              <a href="#">Terms of Service</a>
-              <a href="#">Shipping Policy</a>
-              <a href="#">Refund Policy</a>
-            </div>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }
